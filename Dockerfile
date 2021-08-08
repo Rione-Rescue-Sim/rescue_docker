@@ -27,7 +27,7 @@ RUN apt-get install -y curl && apt-get install -y wget\
   dbus-x11\
   libcanberra-gtk*\
   gradle\
-  docker.io
+  bc
 
 ENV DIRPATH /root/guest
 WORKDIR $DIRPATH
@@ -61,4 +61,5 @@ RUN update-locale LANG=ja_JP.UTF-8
 
 
 # 起動時にはbash shellを起動
-# CMD [ "/bin/bash" ]
+WORKDIR ${DIRPATH}/RioneLauncher
+# CMD [ "/bin/bash","-c", "cd RioneLauncher && ls" ]

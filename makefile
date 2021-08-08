@@ -1,6 +1,7 @@
 NAME := rescue_d
 
 build:
+	xhost local:
 	docker image build -t ${NAME} .
 
 run: 
