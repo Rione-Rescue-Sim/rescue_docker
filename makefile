@@ -1,10 +1,10 @@
 NAME := rescue_d
 
 build:
-	xhost local:
 	docker image build -t ${NAME} .
 
 run: 
+	xhost local:
 	docker run -it --rm -e DISPLAY=unix${DISPLAY} -v /tmp/.X11-unix/:/tmp/.X11-unix  ${NAME}:latest
 
 clean:
