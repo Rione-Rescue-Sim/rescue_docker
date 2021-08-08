@@ -24,8 +24,10 @@ RUN apt-get install -y curl && apt-get install -y wget\
   cron\
   xterm\
   x11-xserver-utils\
+  dbus-x11\
   libcanberra-gtk*\
-  gradle
+  gradle\
+  docker.io
 
 ENV DIRPATH /root/guest
 WORKDIR $DIRPATH
@@ -59,4 +61,4 @@ RUN update-locale LANG=ja_JP.UTF-8
 
 
 # 起動時にはbash shellを起動
-CMD [ "/bin/bash" ]
+# CMD [ "/bin/bash" ]
