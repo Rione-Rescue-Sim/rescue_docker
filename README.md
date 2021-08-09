@@ -5,9 +5,16 @@
 git clone https://github.com/taka0628/rescue_docker.git
 ```
 
-## レスキューを実行する
+## レスキューの実行
+* ファイルに変更があった場合
 ```
 make build
+make run
+bash rioneLauncher_2.2.2.sh 1
+```
+* サーバやサンプルプログラムに更新があった場合
+``` 
+make rebuild
 make run
 bash rioneLauncher_2.2.2.sh 1
 ```
