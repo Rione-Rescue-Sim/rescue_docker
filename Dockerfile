@@ -3,6 +3,7 @@ FROM ubuntu:18.04
 ENV USE_NAME guest
 
 RUN apt-get update
+
 # パッケージインストールで参照するサーバを日本サーバに変更
 # デフォルトのサーバは遠いので通信速度が遅い
 RUN apt-get install -y apt-utils && apt-get install -y perl\
@@ -37,9 +38,6 @@ RUN apt-get install -y curl && apt-get install -y wget\
 
 ENV DIRPATH /root/guest
 WORKDIR $DIRPATH
-
-# RUN wget https://raw.githubusercontent.com/MiglyA/setup/master/Ubuntu_setup.sh
-# RUN wget https://raw.githubusercontent.com/MiglyA/setup/master/rescue_setup.sh
 
 # ./gradlew を実行するためのラッパーを生成
 # これをしないとdockerfileからの./gradlewが実行できない
