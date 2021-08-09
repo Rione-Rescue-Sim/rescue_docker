@@ -12,12 +12,12 @@ cd
 rescue_code_path=$(find */$RescueDirName -maxdepth 1 -type d | head -1)
 echo rescue_code_path: $rescue_code_path
 
-# dockerファイルを探索
-cd
-docker_file_path=$(find */$RescueDockerDirName -maxdepth 1 -type d | head -1)
-echo docker_file_path: $docker_file_path
-
 # レスキューのコードをDockerファイルのあるディレクトリ内にコピー
-cd $rescue_code_path
-cd ..
-rsync -avh --delete $RescueDirName ${root_path}/${docker_file_path}
+if [[ -n $rescue_code_path ]]; then
+
+    cd $rescue_code_path
+    cd ..
+    rsync -avh --delete $RescueDirName ${current_path}
+    
+fi
+
