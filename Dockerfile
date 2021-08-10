@@ -67,5 +67,9 @@ RUN git clone https://github.com/taka0628/RioneLauncher.git
 RUN mkdir rionerescue
 COPY rionerescue ${DIRPATH}/rionerescue
 
+# ホストのscore.csvをマウントするためにファイル作成
+RUN cd ${DIRPATH}/RioneLauncher && \
+  touch score.csv
+
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR ${DIRPATH}/RioneLauncher
