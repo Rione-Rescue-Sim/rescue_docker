@@ -34,7 +34,8 @@ RUN apt-get install -y curl && apt-get install -y wget\
   gnome-terminal\
   cron\
   gradle\
-  bc
+  bc\
+  nano
 
 ENV DIRPATH /root/guest
 WORKDIR $DIRPATH
