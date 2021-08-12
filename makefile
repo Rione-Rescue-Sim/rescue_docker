@@ -12,7 +12,7 @@ build:
 	--build-arg CACHEBUST=${TS} .
 
 # コンテナ実行
-run: 
+run:
 	xhost local:
 	touch ${SCORE_FILE}
 	docker container run \
@@ -32,4 +32,5 @@ rebuild:
 	bash rescue2docker.sh
 	docker image build -t ${NAME} \
 	--build-arg CACHEBUST=${TS} \
+	--pull \
 	--no-cache=true .
