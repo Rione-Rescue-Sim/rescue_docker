@@ -72,6 +72,7 @@ COPY rionerescue ${DIRPATH}/rionerescue
 RUN cd ${DIRPATH}/RioneLauncher && \
   touch score.csv
 
+# コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
 
 
