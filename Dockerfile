@@ -1,6 +1,9 @@
 FROM ubuntu:18.04
 
-ENV USE_NAME guest
+# ユーザーを作成
+ARG DOCKER_UID_=1000
+ARG DOCKER_USER_=guest
+ARG DOCKER_PASSWORD_=guest
 
 RUN apt-get update
 
@@ -37,12 +40,17 @@ RUN apt-get install -y curl && apt-get install -y wget\
   bc\
   nano
 
-ENV DIRPATH /root/guest
+ENV DIRPATH $DOCKER_USER_
 WORKDIR $DIRPATH
+
+RUN groupadd rescue
+RUN useradd -d /${DIRPATH} -m ${DIRPATH}
+RUN chown -R ${DOCKER_USER_} /${DIRPATH}
+
 
 # ./gradlew を実行するためのラッパーを生成
 # これをしないとdockerfileからの./gradlewが実行できない
-RUN gradle wrapper
+# RUN gradle wrapper
 
 # レスキューサーバをインストール
 RUN git clone https://github.com/roborescue/rcrs-server.git
@@ -52,7 +60,7 @@ RUN cd /${DIRPATH}/rcrs-server && \
 
 # サンプルコードをインストール
 RUN git clone https://github.com/roborescue/rcrs-adf-sample.git
-RUN cd ${DIRPATH}/rcrs-adf-sample && \
+RUN cd /${DIRPATH}/rcrs-adf-sample && \
   ./gradlew clean && \
   ./gradlew build
 
@@ -61,20 +69,25 @@ RUN cd ${DIRPATH}/rcrs-adf-sample && \
 ARG CACHEBUST=1
 RUN echo CACHEBUST: $CACHEBUST
 
+
+
 # ランチャーを取得
 RUN git clone https://github.com/taka0628/RioneLauncher.git
 
 # レスキューのソースコードをコンテナ内にコピー
 RUN mkdir rionerescue
-COPY rionerescue ${DIRPATH}/rionerescue
+COPY rionerescue /${DIRPATH}/rionerescue
 
 # ホストのscore.csvをマウントするためにファイル作成
-RUN cd ${DIRPATH}/RioneLauncher && \
+RUN cd /${DIRPATH}/RioneLauncher && \
   touch score.csv
 
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
 
+RUN chown -R ${DOCKER_USER_} /${DIRPATH}
+
+USER ${DOCKER_USER_}
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
-WORKDIR ${DIRPATH}/RioneLauncher
+WORKDIR /${DIRPATH}/RioneLauncher
