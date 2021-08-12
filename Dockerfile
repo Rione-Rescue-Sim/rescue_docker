@@ -47,7 +47,7 @@ RUN gradle wrapper
 # レスキューサーバをインストール
 RUN git clone https://github.com/roborescue/rcrs-server.git
 RUN cd /${DIRPATH}/rcrs-server && \
- ./gradlew clean && \
+  ./gradlew clean && \
   ./gradlew completeBuild
 
 # サンプルコードをインストール
@@ -71,6 +71,9 @@ COPY rionerescue ${DIRPATH}/rionerescue
 # ホストのscore.csvをマウントするためにファイル作成
 RUN cd ${DIRPATH}/RioneLauncher && \
   touch score.csv
+
+ENV NO_AT_BRIDGE 1
+
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR ${DIRPATH}/RioneLauncher
