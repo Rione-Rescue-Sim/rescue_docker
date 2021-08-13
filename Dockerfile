@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 # ユーザーを作成
 ARG DOCKER_UID_=1000
-ARG DOCKER_USER_=guest
+ARG DOCKER_USER_=RDocker
 ARG DOCKER_PASSWORD_=guest
 
 RUN apt-get update
