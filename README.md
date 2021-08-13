@@ -34,6 +34,12 @@ make rebuild
 make run
 ```
 
+## root権限でコンテナに接続
+*  コンテナ実行中のみ有効
+```
+make connect
+```
+
 ## Dockerオブジェクトの削除
 ```
 make clean
