@@ -18,6 +18,7 @@ run:
 	docker container run \
 	-it \
 	--rm \
+	--name ${NAME} \
 	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=/root/${DOCKER_USER_NAME}/RioneLauncher/${SCORE_FILE} \
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
@@ -34,3 +35,7 @@ rebuild:
 	--build-arg CACHEBUST=${TS} \
 	--pull \
 	--no-cache=true .
+
+# root権限で起動中のコンテナに接続
+connect:
+	docker exec -u root -it ${NAME} /bin/bash
