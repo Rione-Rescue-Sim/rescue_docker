@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 
 # ユーザーを作成
+# ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内の変数も書き換えること
 ARG DOCKER_UID_=1000
 ARG DOCKER_USER_=RDocker
 ARG DOCKER_PASSWORD_=guest
