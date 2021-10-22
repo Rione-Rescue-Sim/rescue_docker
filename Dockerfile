@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 
 # ユーザーを作成
+# ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内のDOCKER_USER_NAMEも書き換えること
 ARG DOCKER_UID_=1000
 ARG DOCKER_USER_=RDocker
 ARG DOCKER_PASSWORD_=guest
@@ -20,7 +21,6 @@ RUN locale-gen ja_JP.UTF-8
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:jp
 ENV LC_ALL ja_JP.UTF-8
-
 RUN update-locale LANG=ja_JP.UTF-8
 
 # GUI出力のためのパッケージ
@@ -64,19 +64,19 @@ RUN cd /${DIRPATH}/rcrs-adf-sample && \
   ./gradlew clean && \
   ./gradlew build
 
+RUN chown -R ${DOCKER_USER_} /${DIRPATH}
+
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
 # 頻繁に更新される可能性が高いため
 ARG CACHEBUST=1
 RUN echo CACHEBUST: $CACHEBUST
-
-
 
 # ランチャーを取得
 RUN git clone https://github.com/taka0628/RioneLauncher.git
 
 # レスキューのソースコードをコンテナ内にコピー
 RUN mkdir rionerescue
-COPY rionerescue /${DIRPATH}/rionerescue
+COPY --chown=${DOCKER_USER_}:${DIRPATH} rionerescue /${DIRPATH}/rionerescue
 
 # ホストのscore.csvをマウントするためにファイル作成
 RUN cd /${DIRPATH}/RioneLauncher && \
@@ -85,7 +85,9 @@ RUN cd /${DIRPATH}/RioneLauncher && \
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
 
-RUN chown -R ${DOCKER_USER_} /${DIRPATH}
+# RUN find . -maxdepth 2 -type d | xargs --max-args=1 --max-chars=300 --max-procs=10 chown -R ${DOCKER_USER_}
+RUN chown -R ${DOCKER_USER_} /${DIRPATH}/rionerescue &&\
+  chown -R ${DOCKER_USER_} /${DIRPATH}/RioneLauncher
 
 USER ${DOCKER_USER_}
 

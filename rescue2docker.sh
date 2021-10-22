@@ -12,7 +12,7 @@ root_path=$(
 
 # レスキューソースコードを探索
 cd
-rescue_code_path=$(find -name rionerescue -type d | grep -v "rescue_docker" | grep -v ".local")
+rescue_code_path=$(find -name rionerescue -type d 2>/dev/null | grep -v "rescue_docker" | grep -v ".local")
 echo rescue_code_path: $rescue_code_path
 
 # レスキューのコードをDockerファイルのあるディレクトリ内にコピー
