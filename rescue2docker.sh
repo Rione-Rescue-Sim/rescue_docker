@@ -29,4 +29,6 @@ else
     echo "レスキューのソースコード(rionerescue)を発見できませんでした"
     echo
 
+    return 1
+
 fi
