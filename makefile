@@ -2,7 +2,7 @@ NAME := rescue_d
 TS := `date +%Y%m%d%H%M%S`
 SCORE_FILE := score.csv
 DOCKER_USER_NAME := guest
-CURRENT_PATH := $(Shell pwd)
+CURRENT_PATH := $(shell pwd)
 MOUNT_DIR := mount
 
 help:
@@ -83,11 +83,19 @@ install:
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 	sudo docker run --rm hello-world
 	sudo docker rmi hello-world
-	ifeq ($(Shell getent group docker), $(EMPTY))
-	exit
-	endif
-	-@sudo groupadd docker
-	-@sudo gpasswd -a $(whoami) docker
+ifeq ($(Shell getent group docker), $(EMPTY))
+	sudo groupadd docker
+	sudo gpasswd -a $(whoami) docker
+endif
 	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
 	sudo systemctl status docker
+
+test:
+	isDocker=$(shell getent group docker | grep 'docker:')
+ifeq (${isDocker},docker)
+	echo "hoge"
+	exit
+else
+	echo "huga"
+endif
