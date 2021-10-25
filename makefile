@@ -83,6 +83,9 @@ install:
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 	sudo docker run --rm hello-world
 	sudo docker rmi hello-world
+	ifeq ($(Shell getent group docker), $(EMPTY))
+	exit
+	endif
 	-@sudo groupadd docker
 	-@sudo gpasswd -a $(whoami) docker
 	sudo chgrp docker /var/run/docker.sock
