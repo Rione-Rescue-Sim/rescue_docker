@@ -32,6 +32,7 @@ help:
 	@echo "\t\t使用例：新しいパッケージの導入テストなど"
 	@echo ""
 	@echo "make install\tDockerの環境構築"
+	@echo "\t\t主にDocker環境の構築＆sudo無しでのDockerコマンド実行の設定"
 	@echo "----------------------------------"
 
 # キャッシュ有りでビルド
@@ -69,6 +70,7 @@ rebuild:
 connect:
 	docker exec -u root -it ${NAME} /bin/bash
 
+# 環境構築
 install:
 	sudo apt update
 	sudo apt install -y apt-transport-https \
@@ -89,9 +91,9 @@ ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
 endif
 	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
-	docker run --rm hello-world
-	docker rmi hello-world
+	@echo "環境構築を完了するために再起動してください"
 
+# デバッグ用
 test:
 ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
 	echo "hoge"
