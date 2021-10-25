@@ -28,7 +28,6 @@ else
     echo "[ERROR] $LINENO"
     echo "レスキューのソースコード(rionerescue)を発見できませんでした"
     echo
-
-    return 1
+    exit 1
 
 fi
