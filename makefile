@@ -76,9 +76,14 @@ install:
     curl \
     gnupg-agent \
     software-properties-common
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+	sudo apt update
+	apt-cache policy docker-ce
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 	sudo docker run --rm hello-world
 	sudo docker rmi hello-world
 	sudo groupadd docker
 	sudo gpasswd -a $USER docker
 	sudo systemctl restart docker
+	sudo systemctl status docker
