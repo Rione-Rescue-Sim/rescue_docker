@@ -81,7 +81,7 @@ install:
 	sudo apt update
 	apt-cache policy docker-ce
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-ifeq ($(Shell getent group docker), $(EMPTY))
+ifeq ($(Shell getent group docker),)
 	sudo groupadd docker
 	sudo gpasswd -a $(whoami) docker
 endif
@@ -89,9 +89,10 @@ endif
 	sudo systemctl restart docker
 	docker run --rm hello-world
 	docker rmi hello-world
+
 test:
-	isDocker=$(shell getent group docker | grep 'docker:')
-ifeq (${isDocker},docker)
+	isDocker=
+ifeq (${isDocker},)
 	echo "hoge"
 	exit
 else
