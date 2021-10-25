@@ -81,16 +81,14 @@ install:
 	sudo apt update
 	apt-cache policy docker-ce
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-	sudo docker run --rm hello-world
-	sudo docker rmi hello-world
 ifeq ($(Shell getent group docker), $(EMPTY))
 	sudo groupadd docker
 	sudo gpasswd -a $(whoami) docker
 endif
 	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
-	sudo systemctl status docker
-
+	docker run --rm hello-world
+	docker rmi hello-world
 test:
 	isDocker=$(shell getent group docker | grep 'docker:')
 ifeq (${isDocker},docker)
