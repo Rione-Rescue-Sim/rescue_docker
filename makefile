@@ -83,7 +83,9 @@ install:
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 ifneq ($(shell getent group docker| cut -f 1 --delim=":"),docker)
 	sudo groupadd docker
-	sudo gpasswd -a $(whoami) docker
+endif
+ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
+	sudo gpasswd -a $(shell whoami) docker
 endif
 	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
@@ -91,7 +93,7 @@ endif
 	docker rmi hello-world
 
 test:
-ifneq ($(shell getent group docker| cut -f 1 --delim=":"),docker)
+ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
 	echo "hoge"
 	exit
 else
