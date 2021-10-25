@@ -20,12 +20,8 @@ if [[ -n $rescue_code_path ]]; then
 
     cd $rescue_code_path
     cd ..
-    rsync -avh --delete $RescueDirName ${current_path}
+    rsync -avh --delete --exclude=.git $RescueDirName ${current_path}
 
-    # rionerescue内の.gitディレクトリを削除
-    # ソースコードの偏在をさけるため
-    cd $current_path/$RescueDirName
-    rm -rf .git
 else
 
     echo
