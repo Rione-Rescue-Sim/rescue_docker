@@ -20,7 +20,7 @@ if [[ -n $rescue_code_path ]]; then
 
     cd $rescue_code_path
     cd ..
-    rsync -avh --delete $RescueDirName ${current_path}
+    rsync -avh --delete --exclude=.git $RescueDirName ${current_path}
 
 else
 
@@ -28,5 +28,6 @@ else
     echo "[ERROR] $LINENO"
     echo "レスキューのソースコード(rionerescue)を発見できませんでした"
     echo
+    exit 1
 
 fi

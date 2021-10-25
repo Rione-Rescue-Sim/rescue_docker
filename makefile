@@ -2,7 +2,7 @@ NAME := rescue_d
 TS := `date +%Y%m%d%H%M%S`
 SCORE_FILE := score.csv
 DOCKER_USER_NAME := guest
-CURRENT_PATH := $(Shell pwd)
+CURRENT_PATH := $(shell pwd)
 MOUNT_DIR := mount
 
 help:
@@ -14,16 +14,19 @@ help:
 	@echo "##注意##"
 	@echo "コンテナ内のデータはレスキューのスコアのみ保存されます。"
 	@echo "それ以外のデータはコンテナ終了時にすべて破棄されます。"
-	@echo "コンテナ内での開発はしないでください、コンテナ終了時に消えます。"
+	@echo "コンテナ内での開発はソースコードをコピーする際に.gitを削除しているのでできません"
 	@echo "新しいパッケージを導入する場合はDocker fileを編集してください。"
 	@echo "----------------------------------"
 	@echo "コマンド一覧"
 	@echo "make build\tキャッシュありでビルド"
+	@echo ""
 	@echo "make rebuild\tキャッシュなしでビルド"
 	@echo "\t\tキャッシュを使用->サーバは更新されないが短時間でビルド可能"
 	@echo "\t\tキャッシュを使用しない->サーバを更新してビルド"
 	@echo ""
 	@echo "make run\tコンテナを起動"
+	@echo ""
+	@echo "make sync\tホストのソースコード(rionerescue)をコンテナ内に同期"
 	@echo ""
 	@echo "make clean\tコンテナとイメージを削除"
 	@echo "\t\t命令はdocker system pluneなので他のDockerイメージも消えます"
@@ -32,6 +35,7 @@ help:
 	@echo "\t\t使用例：新しいパッケージの導入テストなど"
 	@echo ""
 	@echo "make install\tDockerの環境構築"
+	@echo "\t\t主にDocker環境の構築＆sudo無しでのDockerコマンド実行の設定"
 	@echo "----------------------------------"
 
 # キャッシュ有りでビルド
@@ -69,6 +73,12 @@ rebuild:
 connect:
 	docker exec -u root -it ${NAME} /bin/bash
 
+sync:
+	bash rescue2docker.sh
+	docker cp rionerescue/ ${NAME}:/RDocker/
+
+
+# 環境構築
 install:
 	sudo apt update
 	sudo apt install -y apt-transport-https \
@@ -81,9 +91,18 @@ install:
 	sudo apt update
 	apt-cache policy docker-ce
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-	sudo docker run --rm hello-world
-	sudo docker rmi hello-world
-	sudo groupadd docker
-	sudo gpasswd -a $USER docker
+ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
+	sudo gpasswd -a $(shell whoami) docker
+endif
+	sudo chgrp docker /var/run/docker.sock
 	sudo systemctl restart docker
-	sudo systemctl status docker
+	@echo "環境構築を完了するために再起動してください"
+
+# デバッグ用
+test:
+ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
+	echo "hoge"
+	exit
+else
+	echo "huga"
+endif
