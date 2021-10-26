@@ -52,6 +52,8 @@ RUN chown -R ${DOCKER_USER_} /${DIRPATH}
 # これをしないとdockerfileからの./gradlewが実行できない
 # RUN gradle wrapper
 
+USER ${DOCKER_USER_}
+
 # レスキューサーバをインストール
 RUN git clone https://github.com/roborescue/rcrs-server.git
 RUN cd /${DIRPATH}/rcrs-server && \
@@ -64,7 +66,7 @@ RUN cd /${DIRPATH}/rcrs-adf-sample && \
   ./gradlew clean && \
   ./gradlew build
 
-RUN chown -R ${DOCKER_USER_} /${DIRPATH}
+# RUN chown -R ${DOCKER_USER_} /${DIRPATH}
 
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
 # 頻繁に更新される可能性が高いため
@@ -76,7 +78,7 @@ RUN git clone https://github.com/taka0628/RioneLauncher.git
 
 # レスキューのソースコードをコンテナ内にコピー
 RUN mkdir rionerescue
-COPY --chown=${DOCKER_USER_}:${DIRPATH} rionerescue /${DIRPATH}/rionerescue
+# COPY --chown=${DOCKER_USER_}:${DIRPATH} rionerescue /${DIRPATH}/rionerescue
 
 # ホストのscore.csvをマウントするためにファイル作成
 RUN cd /${DIRPATH}/RioneLauncher && \
@@ -86,8 +88,8 @@ RUN cd /${DIRPATH}/RioneLauncher && \
 ENV NO_AT_BRIDGE 1
 
 # RUN find . -maxdepth 2 -type d | xargs --max-args=1 --max-chars=300 --max-procs=10 chown -R ${DOCKER_USER_}
-RUN chown -R ${DOCKER_USER_} /${DIRPATH}/rionerescue &&\
-  chown -R ${DOCKER_USER_} /${DIRPATH}/RioneLauncher
+# RUN chown -R ${DOCKER_USER_} /${DIRPATH}/rionerescue &&\
+# chown -R ${DOCKER_USER_} /${DIRPATH}/RioneLauncher
 
 USER ${DOCKER_USER_}
 
