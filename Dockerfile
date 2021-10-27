@@ -2,9 +2,8 @@ FROM ubuntu:18.04
 
 # ユーザーを作成
 # ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内のDOCKER_USER_NAMEも書き換えること
-ARG DOCKER_UID_=1000
 ARG DOCKER_USER_=RDocker
-ARG DOCKER_PASSWORD_=guest
+ARG RescueSRC_=RIORescue
 
 RUN apt-get update
 
@@ -77,8 +76,8 @@ RUN echo CACHEBUST: $CACHEBUST
 RUN git clone https://github.com/taka0628/RioneLauncher.git
 
 # レスキューのソースコードをコンテナ内にコピー
-RUN mkdir rionerescue
-# COPY --chown=${DOCKER_USER_}:${DIRPATH} rionerescue /${DIRPATH}/rionerescue
+RUN mkdir ${RescueSRC_}
+COPY --chown=${DOCKER_USER_}:${DIRPATH} ${RescueSRC_} /${DIRPATH}/${RescueSRC_}
 
 # ホストのscore.csvをマウントするためにファイル作成
 RUN cd /${DIRPATH}/RioneLauncher && \

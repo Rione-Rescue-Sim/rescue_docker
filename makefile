@@ -3,7 +3,7 @@ TS := `date +%Y%m%d%H%M%S`
 SCORE_FILE := score.csv
 DOCKER_USER_NAME := guest
 CURRENT_PATH := $(shell pwd)
-MOUNT_DIR := mount
+RescueSRC := RIORescue
 
 help:
 	@echo "----------------------------------"
@@ -75,7 +75,7 @@ connect:
 
 sync:
 	bash rescue2docker.sh
-	docker cp rionerescue/ ${NAME}:/RDocker/
+	docker cp ${RescueSRC}/ ${NAME}:/RDocker/
 
 
 # 環境構築
