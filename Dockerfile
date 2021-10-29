@@ -66,7 +66,7 @@ RUN cd /${DIRPATH}/rcrs-adf-sample && \
   ./gradlew build
 
 # ランチャーを取得
-RUN git clone https://github.com/taka0628/RioneLauncher.git
+RUN git clone https://github.com/Rione-Rescue-Sim/rescue_docker.git
 
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
 # ビルド時に最低限必要な処理
