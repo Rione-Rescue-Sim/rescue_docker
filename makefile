@@ -46,7 +46,7 @@ help:
 build:
 	bash rescue2docker.sh
 	docker image build -t ${NAME} \
-	--build-arg CACHEBUST_BUILD=${TS} .
+	--build-arg CACHEBUST=${TS} .
 
 # コンテナ実行
 run:
@@ -77,7 +77,7 @@ rebuild:
     fi
 	bash rescue2docker.sh
 	docker image build -t ${NAME} \
-	--build-arg CACHEBUST_BUILD=${TS} \
+	--build-arg CACHEBUST=${TS} \
 	--pull \
 	--no-cache=true .
 
