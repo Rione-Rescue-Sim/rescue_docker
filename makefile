@@ -63,6 +63,12 @@ clean:
 
 # キャッシュを使わずにビルド
 rebuild:
+	@echo "コンテナの再構築には時間がかかります"
+	@echo "コンテナを再構築しますか？ (y/n)"
+	@read -p "->" ans;\
+	if [ "$$ans" != y ]; then  \
+      exit 1;\
+    fi
 	bash rescue2docker.sh
 	docker image build -t ${NAME} \
 	--build-arg CACHEBUST=${TS} \
@@ -100,9 +106,10 @@ endif
 
 # デバッグ用
 test:
-ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
-	echo "hoge"
-	exit
-else
+	@echo "コンテナの再構築には時間がかかります"
+	@echo "コンテナを再構築しますか？ (y/n)"
+	@read -p "->" ans;\
+	if [ "$$ans" != y ]; then  \
+      exit 1;\
+    fi
 	echo "huga"
-endif
