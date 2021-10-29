@@ -65,15 +65,18 @@ RUN cd /${DIRPATH}/rcrs-adf-sample && \
   ./gradlew clean && \
   ./gradlew build
 
-# RUN chown -R ${DOCKER_USER_} /${DIRPATH}
+# ランチャーを取得
+RUN git clone https://github.com/taka0628/RioneLauncher.git
 
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
-# 頻繁に更新される可能性が高いため
+# ビルド時に最低限必要な処理
 ARG CACHEBUST=1
 RUN echo CACHEBUST: $CACHEBUST
 
-# ランチャーを取得
-RUN git clone https://github.com/taka0628/RioneLauncher.git
+# Docker内でupgradeは避けたほうがいいと言われているが、rescueはウェブサーバでは無いのでupgradeを使う
+USER root
+RUN apt-get update && apt-get -y upgrade
+USER ${DOCKER_USER_}
 
 # レスキューのソースコードをコンテナ内にコピー
 RUN mkdir ${RescueSRC_}
@@ -86,11 +89,12 @@ RUN cd /${DIRPATH}/RioneLauncher && \
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
 
-# RUN find . -maxdepth 2 -type d | xargs --max-args=1 --max-chars=300 --max-procs=10 chown -R ${DOCKER_USER_}
-# RUN chown -R ${DOCKER_USER_} /${DIRPATH}/rionerescue &&\
-# chown -R ${DOCKER_USER_} /${DIRPATH}/RioneLauncher
-
-USER ${DOCKER_USER_}
+RUN cd /${DIRPATH}/rcrs-server/ && \
+  git pull && \
+  cd /${DIRPATH}/rcrs-adf-sample/ && \
+  git pull &&\
+  cd /${DIRPATH}/RioneLauncher/ && \
+  git pull
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR /${DIRPATH}/RioneLauncher
