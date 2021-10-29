@@ -14,19 +14,23 @@ help:
 	@echo "##注意##"
 	@echo "コンテナ内のデータはレスキューのスコアのみ保存されます。"
 	@echo "それ以外のデータはコンテナ終了時にすべて破棄されます。"
-	@echo "コンテナ内での開発はソースコードをコピーする際に.gitを削除しているのでできません"
+	@echo "コンテナ内での開発はコンテナ終了時に破棄されるので避けてください。"
 	@echo "新しいパッケージを導入する場合はDocker fileを編集してください。"
 	@echo "----------------------------------"
 	@echo "コマンド一覧"
-	@echo "make build\tキャッシュありでビルド"
+	@echo "make build\tコンテナをビルド"
+	@echo "\t\tパッケージやサーバの更新などをする"
+	@echo "\t\t基本はこちらを利用"
 	@echo ""
-	@echo "make rebuild\tキャッシュなしでビルド"
-	@echo "\t\tキャッシュを使用->サーバは更新されないが短時間でビルド可能"
-	@echo "\t\tキャッシュを使用しない->サーバを更新してビルド"
+	@echo "make rebuild\tubuntu含むすべてをゼロからビルド"
+	@echo "\t\t時間がかかります"
+	@echo "\t\t何か不具合があった場合は実行"
 	@echo ""
 	@echo "make run\tコンテナを起動"
+	@echo "\t\t ソースコードを同期してからコンテナ起動"
 	@echo ""
-	@echo "make sync\tホストのソースコード(rionerescue)をコンテナ内に同期"
+	@echo "make sync\tホストのソースコード(${RescueSRC})をコンテナ内に同期"
+	@echo "\t\t コンテナ起動中にソースコードを同期する際に利用"
 	@echo ""
 	@echo "make clean\tコンテナとイメージを削除"
 	@echo "\t\t命令はdocker system pluneなので他のDockerイメージも消えます"
@@ -42,12 +46,14 @@ help:
 build:
 	bash rescue2docker.sh
 	docker image build -t ${NAME} \
-	--build-arg CACHEBUST=${TS} .
+	--build-arg CACHEBUST_BUILD=${TS} .
 
 # コンテナ実行
 run:
 	xhost local:
 	touch ${SCORE_FILE}
+	bash rescue2docker.sh
+	gnome-terminal --window -e 'bash -c "sleep 1;make sync;"'
 	docker container run \
 	-it \
 	--rm \
@@ -71,7 +77,7 @@ rebuild:
     fi
 	bash rescue2docker.sh
 	docker image build -t ${NAME} \
-	--build-arg CACHEBUST=${TS} \
+	--build-arg CACHEBUST_BUILD=${TS} \
 	--pull \
 	--no-cache=true .
 
@@ -81,6 +87,10 @@ connect:
 
 sync:
 	bash rescue2docker.sh
+ifeq ($(shell docker container ls | grep "rescue_d:latest"),)
+	@echo "コンテナが起動していません"
+	exit 1
+endif
 	docker cp ${RescueSRC}/ ${NAME}:/RDocker/
 
 
@@ -106,10 +116,4 @@ endif
 
 # デバッグ用
 test:
-	@echo "コンテナの再構築には時間がかかります"
-	@echo "コンテナを再構築しますか？ (y/n)"
-	@read -p "->" ans;\
-	if [ "$$ans" != y ]; then  \
-      exit 1;\
-    fi
-	echo "huga"
+	gnome-terminal -e 'bash -c "sleep 1;echo "hoge";"'
