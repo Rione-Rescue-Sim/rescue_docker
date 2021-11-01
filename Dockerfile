@@ -66,7 +66,7 @@ RUN cd /${DIRPATH}/rcrs-adf-sample && \
   ./gradlew build
 
 # ランチャーを取得
-RUN git clone https://github.com/Rione-Rescue-Sim/rescue_docker.git
+RUN git clone https://github.com/Rione-Rescue-Sim/RioneLauncher.git
 
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
 # ビルド時に最低限必要な処理
@@ -76,15 +76,16 @@ RUN echo CACHEBUST: $CACHEBUST
 # Docker内でupgradeは避けたほうがいいと言われているが、rescueはウェブサーバでは無いのでupgradeを使う
 USER root
 RUN apt-get update && apt-get -y upgrade
-USER ${DOCKER_USER_}
 
 # レスキューのソースコードをコンテナ内にコピー
 RUN mkdir ${RescueSRC_}
 COPY --chown=${DOCKER_USER_}:${DIRPATH} ${RescueSRC_} /${DIRPATH}/${RescueSRC_}
 
 # ホストのscore.csvをマウントするためにファイル作成
-RUN cd /${DIRPATH}/RioneLauncher && \
+RUN cd /${DIRPATH}/RioneLauncher/ && \
   touch score.csv
+
+USER ${DOCKER_USER_}
 
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
