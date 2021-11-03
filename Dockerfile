@@ -81,11 +81,11 @@ RUN apt-get update && apt-get -y upgrade
 RUN mkdir ${RescueSRC_}
 COPY --chown=${DOCKER_USER_}:${DIRPATH} ${RescueSRC_} /${DIRPATH}/${RescueSRC_}
 
+USER ${DOCKER_USER_}
+
 # ホストのscore.csvをマウントするためにファイル作成
 RUN cd /${DIRPATH}/RioneLauncher/ && \
   touch score.csv
-
-USER ${DOCKER_USER_}
 
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1

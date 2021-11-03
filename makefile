@@ -1,7 +1,7 @@
 NAME := rescue_d
 TS := `date +%Y%m%d%H%M%S`
 SCORE_FILE := score.csv
-DOCKER_USER_NAME := guest
+DOCKER_USER_NAME := RDocker
 CURRENT_PATH := $(shell pwd)
 RescueSRC := RIORescue
 
@@ -58,7 +58,7 @@ run:
 	-it \
 	--rm \
 	--name ${NAME} \
-	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=/root/${DOCKER_USER_NAME}/RioneLauncher/${SCORE_FILE} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=/${DOCKER_USER_NAME}/RioneLauncher/${SCORE_FILE} \
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
@@ -91,7 +91,7 @@ ifeq ($(shell docker container ls | grep "rescue_d:latest"),)
 	@echo "コンテナが起動していません"
 	exit 1
 endif
-	docker cp ${RescueSRC}/ ${NAME}:/RDocker/
+	docker cp ${RescueSRC}/ ${NAME}:/${DOCKER_USER_NAME}/
 
 
 # 環境構築
