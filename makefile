@@ -53,7 +53,7 @@ run:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
-	gnome-terminal --window -e 'bash -c "sleep 1;make sync;"'
+	gnome-terminal --tab -e 'bash -c "sleep 1;make sync;"'
 	docker container run \
 	-it \
 	--rm \
