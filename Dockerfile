@@ -4,6 +4,7 @@ FROM ubuntu:18.04
 # ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内のDOCKER_USER_NAMEも書き換えること
 ARG DOCKER_USER_=RDocker
 ARG RescueSRC_=RIORescue
+ARG UID=5000
 
 RUN apt-get update
 
@@ -39,22 +40,14 @@ RUN apt-get install -y curl && apt-get install -y wget\
 	bc\
 	nano
 
-ENV DIRPATH $DOCKER_USER_
+ENV DIRPATH home/${DOCKER_USER_}
 WORKDIR $DIRPATH
 
-RUN groupadd rescue
-RUN useradd -d /${DIRPATH} -m ${DIRPATH}
+# RUN groupadd rescue
+RUN useradd ${DOCKER_USER_}
 RUN chown -R ${DOCKER_USER_} /${DIRPATH}
 
-
-# ./gradlew を実行するためのラッパーを生成
-# これをしないとdockerfileからの./gradlewが実行できない
-# RUN gradle wrapper
-
-RUN wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash\
-	&& chmod a+rwx git-completion.bash\
-	&& cd /etc/skel\
-	&& echo "source /RDocker/git-completion.bash" >> .bashrc
+RUN echo "source /usr/share/bash-completion/completions/git" >> ~/.bashrc
 
 USER ${DOCKER_USER_}
 
@@ -83,8 +76,8 @@ USER root
 RUN apt-get update && apt-get -y upgrade
 
 # レスキューのソースコードをコンテナ内にコピー
-RUN mkdir ${RescueSRC_}
-COPY --chown=${DOCKER_USER_}:${DIRPATH} ${RescueSRC_} /${DIRPATH}/${RescueSRC_}
+RUN cd /${DIRPATH} && mkdir ${RescueSRC_}
+COPY --chown=${DOCKER_USER_}:${DOCKER_USER_} ${RescueSRC_}/ /${DIRPATH}/${RescueSRC_}/
 
 USER ${DOCKER_USER_}
 
