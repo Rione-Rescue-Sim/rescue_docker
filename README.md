@@ -1,10 +1,5 @@
 # 導入
 
-## クローン
-```
-git clone https://github.com/taka0628/rescue_docker.git
-```
-
 ## Dockerの環境構築
 ```
 sudo apt update
