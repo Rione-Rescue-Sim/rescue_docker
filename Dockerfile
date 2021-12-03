@@ -76,8 +76,8 @@ USER root
 RUN apt-get update && apt-get -y upgrade
 
 # レスキューのソースコードをコンテナ内にコピー
-RUN cd /${DIRPATH} && mkdir ${RescueSRC_}
-COPY --chown=${DOCKER_USER_}:${DOCKER_USER_} ${RescueSRC_}/ /${DIRPATH}/${RescueSRC_}/
+# RUN cd /${DIRPATH} && mkdir ${RescueSRC_}
+# COPY --chown=${DOCKER_USER_}:${DOCKER_USER_} ${RescueSRC_}/ /${DIRPATH}/${RescueSRC_}/
 
 USER ${DOCKER_USER_}
 

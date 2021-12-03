@@ -2,14 +2,17 @@ NAME := rescue_d
 TS := `date +%Y%m%d%H%M%S`
 SCORE_FILE := score.csv
 DOCKER_USER_NAME := RDocker
+DOCKER_HOME_DIR := /home/${DOCKER_USER_NAME}
 CURRENT_PATH := $(shell pwd)
 RescueSRC := RIORescue
 
 help:
 	@echo "----------------------------------"
 	@echo "レスキュー実行手順"
+	@echo "コマンド実行時にレスキューのソースコードを探索して同期するので、"
+	@echo "手動で同期を取る必要はありません"
 	@echo "1. make build"
-	@echo "2. make run"
+	@echo "2. make rioneLauncher"
 	@echo "----------------------------------"
 	@echo "##注意##"
 	@echo "コンテナ内のデータはレスキューのスコアのみ保存されます。"
@@ -20,6 +23,7 @@ help:
 	@echo "コマンド一覧"
 	@echo "make build\tコンテナをビルド"
 	@echo "\t\tパッケージやサーバの更新などをする"
+	@echo "\t\tapt updateと同じ感じです"
 	@echo "\t\t基本はこちらを利用"
 	@echo ""
 	@echo "make rebuild\tubuntu含むすべてをゼロからビルド"
@@ -28,6 +32,9 @@ help:
 	@echo ""
 	@echo "make run\tコンテナを起動"
 	@echo "\t\t ソースコードを同期してからコンテナ起動"
+	@echo ""
+	@echo "make rioneLauncher\tレスキューを実行"
+	@echo "\t\t make run -> bash rioneLauncher 1を省略できる"
 	@echo ""
 	@echo "make sync\tホストのソースコード(${RescueSRC})をコンテナ内に同期"
 	@echo "\t\t コンテナ起動中にソースコードを同期する際に利用"
@@ -53,17 +60,38 @@ run:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
-	gnome-terminal --tab -e 'bash -c "sleep 1;make sync;"'
+	# gnome-terminal --tab -e 'bash -c "sleep 1;make sync;"'
 	docker container run \
 	-it \
 	--rm \
+	-d \
 	--name ${NAME} \
-	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=/${DOCKER_USER_NAME}/RioneLauncher/${SCORE_FILE} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
+	docker container cp \
+	${RescueSRC} ${NAME}:${DOCKER_HOME_DIR}
+	docker container exec -it ${NAME} bash
+	docker container stop ${NAME}
+
 
 rioneLauncher:
+	xhost local:
+	touch ${SCORE_FILE}
+	bash rescue2docker.sh
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
+	-e DISPLAY=unix${DISPLAY} \
+	-v /tmp/.X11-unix/:/tmp/.X11-unix \
+	${NAME}:latest
+	docker container cp \
+	${RescueSRC} ${NAME}:${DOCKER_HOME_DIR}
+	bash execRioneLauncherInDocker.sh ${NAME}
 
 
 # dockerのリソースを開放
