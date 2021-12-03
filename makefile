@@ -63,6 +63,9 @@ run:
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 
+rioneLauncher:
+
+
 # dockerのリソースを開放
 clean:
 	docker system prune
@@ -116,4 +119,4 @@ endif
 
 # デバッグ用
 test:
-	gnome-terminal -e 'bash -c "sleep 1;echo "hoge";"'
+	bash sandbox.sh
