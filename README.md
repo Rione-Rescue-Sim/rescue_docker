@@ -24,6 +24,10 @@ make rioneLauncher
 make build
 make rioneLauncher
 ```
+## 更新
+```
+make update
+```
 
 <!-- --- -->
 # コマンド解説
@@ -38,6 +42,10 @@ make build
 * 時間がかかるので、不具合があった際などに使用
 ```
 make rebuild
+```
+## 最新のDockerFileでビルド
+```
+make update
 ```
 
 ## コンテナの実行

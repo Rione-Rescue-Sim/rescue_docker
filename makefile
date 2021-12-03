@@ -45,6 +45,10 @@ help:
 	@echo "make connect\t起動中のコンテナにroot権限で接続"
 	@echo "\t\t使用例：新しいパッケージの導入テストなど"
 	@echo ""
+	@echo "make update\tアップデート"
+	@echo "\t\t最新のDockerFileでビルドする"
+	@echo "\t\tgit pull & make build"
+	@echo ""
 	@echo "make install\tDockerの環境構築"
 	@echo "\t\t主にDocker環境の構築＆sudo無しでのDockerコマンド実行の設定"
 	@echo "----------------------------------"
@@ -124,6 +128,9 @@ ifeq ($(shell docker container ls | grep "rescue_d:latest"),)
 endif
 	docker cp ${RescueSRC}/ ${NAME}:/${DOCKER_USER_NAME}/
 
+update:
+	git pull
+	make build
 
 # 環境構築
 install:
