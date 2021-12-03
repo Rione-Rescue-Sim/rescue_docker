@@ -65,7 +65,7 @@ run:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
 	# gnome-terminal --tab -e 'bash -c "sleep 1;make sync;"'
-ifeq ($(shell docker container ls | grep "${NAME}"),)
+ifeq ($(shell docker container ps | grep "${NAME}"),)
 	docker container stop ${NAME}
 endif
 	docker container run \
@@ -87,7 +87,7 @@ rioneLauncher:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
-ifeq ($(shell docker container ls | grep "${NAME}"),)
+ifeq ($(shell docker container ps | grep "${NAME}"),)
 	docker container stop ${NAME}
 endif
 	docker container run \
