@@ -84,6 +84,9 @@ rioneLauncher:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
+ifneq ($(shell docker container ls | grep "${NAME}"),)
+	docker container stop ${NAME}
+endif
 	docker container run \
 	-it \
 	--rm \
