@@ -64,10 +64,7 @@ run:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
-	# gnome-terminal --tab -e 'bash -c "sleep 1;make sync;"'
-ifeq ($(shell docker container ls | grep "${NAME}"),)
-	docker container stop ${NAME}
-endif
+	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
 	--rm \
@@ -87,9 +84,7 @@ rioneLauncher:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
-ifeq ($(shell docker container ls | grep "${NAME}"),)
-	docker container stop ${NAME}
-endif
+	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
 	--rm \
@@ -160,4 +155,12 @@ endif
 
 # デバッグ用
 test:
-	bash sandbox.sh
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
+	-e DISPLAY=unix${DISPLAY} \
+	-v /tmp/.X11-unix/:/tmp/.X11-unix \
+	${NAME}:latest
