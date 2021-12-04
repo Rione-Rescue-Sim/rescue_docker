@@ -2,7 +2,7 @@
 
 NAME=$1
 
-if $(docker container ps | grep "${NAME}"); then
+if docker container ps | grep ${NAME} 2>/dev/null; then
 echo "container stop"
-# docker container stop ${NAME}
+docker container stop ${NAME}
 fi
