@@ -64,7 +64,7 @@ run:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
-	bash dockerContainerStop.sh
+	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
 	--rm \
@@ -84,7 +84,7 @@ rioneLauncher:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash rescue2docker.sh
-	bash dockerContainerStop.sh
+	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
 	--rm \
@@ -155,4 +155,12 @@ endif
 
 # デバッグ用
 test:
-	bash sandbox.sh
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
+	-e DISPLAY=unix${DISPLAY} \
+	-v /tmp/.X11-unix/:/tmp/.X11-unix \
+	${NAME}:latest
