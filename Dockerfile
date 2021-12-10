@@ -3,8 +3,6 @@ FROM ubuntu:18.04
 # ユーザーを作成
 # ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内のDOCKER_USER_NAMEも書き換えること
 ARG DOCKER_USER_=RDocker
-ARG RescueSRC_=RIORescue
-ARG UID=5000
 
 RUN apt-get update
 
