@@ -43,7 +43,7 @@ help:
 	@echo "\t\t命令はdocker system pluneなので他のDockerイメージも消えます"
 	@echo ""
 	@echo "make connect\t起動中のコンテナにroot権限で接続"
-	@echo "\t\t使用例：新しいパッケージの導入テストなど"
+	@echo "\t\t使用例: 新しいパッケージの導入テストなど"
 	@echo ""
 	@echo "make update\tアップデート"
 	@echo "\t\t最新のDockerFileでビルドする"
@@ -74,8 +74,7 @@ run:
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
-	docker container cp \
-	${RescueSRC} ${NAME}:${DOCKER_HOME_DIR}
+	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	docker container exec -it ${NAME} bash
 	docker container stop ${NAME}
 
@@ -94,8 +93,7 @@ rioneLauncher:
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
-	docker container cp \
-	${RescueSRC} ${NAME}:${DOCKER_HOME_DIR}
+	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	bash execRioneLauncherInDocker.sh ${NAME}
 
 
