@@ -3,6 +3,8 @@
 # makefileからkillをトラップできないので、kill時にコンテナを停止させるために作成
 CONTAINER_NAME=$1
 
+ARG=$2
+
 trap 'last' {1,2,3,15}
 
 function last(){
@@ -14,6 +16,6 @@ function last(){
 docker container exec \
 	-it \
 	${CONTAINER_NAME} \
-	bash rioneLauncher_2.2.2.sh 1
+	bash rioneLauncher_2.2.2.sh ${ARG}
 
 docker container stop ${CONTAINER_NAME}
