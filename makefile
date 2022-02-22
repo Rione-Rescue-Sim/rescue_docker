@@ -149,7 +149,6 @@ endif
 
 # デバッグ用
 test:
-	xhost local:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
 	docker container run \
