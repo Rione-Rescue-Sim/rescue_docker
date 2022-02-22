@@ -31,6 +31,5 @@ else
     echo "[ERROR] $LINENO"
     echo "レスキューのソースコードを発見できませんでした"
     echo
-    exit 1
 
 fi
