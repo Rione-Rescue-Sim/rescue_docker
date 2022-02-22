@@ -31,7 +31,7 @@ RUN apt-get install -y xterm && apt-get install -y x11-xserver-utils\
 RUN apt-get update
 RUN apt-get install -y curl && apt-get install -y wget\
 	git\
-	openjdk-11-jdk\
+	openjdk-17-jdk\
 	gnome-terminal\
 	cron\
 	gradle\
@@ -52,7 +52,6 @@ USER ${DOCKER_USER_}
 # レスキューサーバをインストール
 RUN git clone https://github.com/roborescue/rcrs-server.git
 RUN cd /${DIRPATH}/rcrs-server && \
-	./gradlew clean && \
 	./gradlew completeBuild
 
 # サンプルコードをインストール
