@@ -151,7 +151,7 @@ endif
 test:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
-	faketty docker container run \
+	docker container run \
 	-it \
 	--rm \
 	-d \
@@ -165,7 +165,6 @@ test:
 	docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
 	docker container exec -d ${NAME} make testInContainer
 	bash execRioneLauncherInDocker.sh ${NAME} debug
-	docker container stop ${NAME}
 
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg

@@ -13,18 +13,16 @@ function last(){
 	exit 1
 }
 
-if [[ ${ARG} == 'debug' ]]; then
+# if [[ ${ARG} == 'debug' ]]; then
 
-	faketty docker container exec -it ${CONTAINER_NAME} bash rioneLauncher_2.2.2.sh ${ARG}
+# 	faketty docker container exec -it ${CONTAINER_NAME} bash rioneLauncher_2.2.2.sh ${ARG}
 
-else
+# else
 
-	docker container exec \
-	-it \
-	${CONTAINER_NAME} \
-	bash rioneLauncher_2.2.2.sh ${ARG}
+# 	docker container exec -it ${CONTAINER_NAME} bash rioneLauncher_2.2.2.sh ${ARG}
 
+# fi
 
-fi
+docker container exec -it ${CONTAINER_NAME} bash rioneLauncher_2.2.2.sh ${ARG}
 
 docker container stop ${CONTAINER_NAME}
