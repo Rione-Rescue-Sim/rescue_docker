@@ -177,7 +177,7 @@ testInContainer:
 github-actions-test:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
-	faketty docker container run \ 
+	faketty docker container run \
 	-it \
 	--rm \
 	-d \
