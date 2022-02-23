@@ -152,7 +152,6 @@ test:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
 	docker container run \
-	-it \
 	--rm \
 	-d \
 	--name ${NAME} \
@@ -162,7 +161,7 @@ test:
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
-	docker container exec -it ${NAME} make testInContainer
+	docker container exec ${NAME} make testInContainer
 	bash execRioneLauncherInDocker.sh ${NAME} debug
 
 testInContainer:
