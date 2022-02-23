@@ -152,6 +152,7 @@ test:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
 	docker container run \
+	-it \
 	--rm \
 	-d \
 	--name ${NAME} \
@@ -161,9 +162,10 @@ test:
 	${NAME}:latest
 	docker container ls
 	# bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	# docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
-	# docker container exec ${NAME} make testInContainer
-	# bash execRioneLauncherInDocker.sh ${NAME} debug
+	docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
+	docker container exec ${NAME} make testInContainer
+	bash execRioneLauncherInDocker.sh ${NAME} debug
+	docker container stop ${NAME}
 
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
