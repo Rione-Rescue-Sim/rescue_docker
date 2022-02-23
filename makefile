@@ -159,10 +159,11 @@ test:
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
-	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
-	docker container exec ${NAME} make testInContainer
-	bash execRioneLauncherInDocker.sh ${NAME} debug
+	docker container ls
+	# bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
+	# docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
+	# docker container exec ${NAME} make testInContainer
+	# bash execRioneLauncherInDocker.sh ${NAME} debug
 
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
