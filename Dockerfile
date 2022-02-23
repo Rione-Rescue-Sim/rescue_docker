@@ -53,7 +53,7 @@ USER ${DOCKER_USER_}
 # 以降のコード内でサーバのディレクトリ名を一致させるために作成
 ENV RCRS_SREVER_NAME rcrs-server-1.5
 # レスキューサーバをインストール
-RUN wget https://github.com/roborescue/rcrs-server/archive/refs/tags/v1.5.tar.gz &&\
+RUN wget -q https://github.com/roborescue/rcrs-server/archive/refs/tags/v1.5.tar.gz &&\
 	tar xzf v1.5.tar.gz &&\
 	rm v1.5.tar.gz &&\
 	cd ${RCRS_SREVER_NAME} &&\
@@ -61,7 +61,7 @@ RUN wget https://github.com/roborescue/rcrs-server/archive/refs/tags/v1.5.tar.gz
 	./gradlew completeBuild
 
 # サンプルコードをインストール
-RUN wget https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v1.1.tar.gz &&\
+RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v1.1.tar.gz &&\
 	tar xzf v1.1.tar.gz &&\
 	rm v1.1.tar.gz &&\
 	cd /${DIRPATH}/adf-sample-agent-java-1.1 && \
