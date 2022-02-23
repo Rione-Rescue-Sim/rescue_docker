@@ -166,13 +166,18 @@ test:
 	docker container exec -d ${NAME} make testInContainer
 	bash execRioneLauncherInDocker.sh ${NAME} debug
 
+# テストマップの時間を10サイクルに変更
+# テストする際に300サイクル待っていられないので作成
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
 
+# github actions用
+# github actionsにはTTYがないので-itが使えない
+# -itを使えないとrun状態でコンテナを待機させられないので疑似TTYを使うためのfakettyをTTYの使用するコマンドの先頭につける
 github-actions-test:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
-	faketty docker container run \
+	faketty docker container run \ 
 	-it \
 	--rm \
 	-d \
