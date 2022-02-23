@@ -36,9 +36,9 @@ help:
 	@echo "make rioneLauncher\tレスキューを実行"
 	@echo "\t\t make run -> bash rioneLauncher 1を省略できる"
 	@echo ""
-	@echo "make sync\tホストのソースコード(${RescueSRC})をコンテナ内に同期"
-	@echo "\t\t コンテナ起動中にソースコードを同期する際に利用"
-	@echo ""
+	# @echo "make sync\tホストのソースコード(${RescueSRC})をコンテナ内に同期"
+	# @echo "\t\t コンテナ起動中にソースコードを同期する際に利用"
+	# @echo ""
 	@echo "make clean\tコンテナとイメージを削除"
 	@echo "\t\t命令はdocker system pluneなので他のDockerイメージも消えます"
 	@echo ""
@@ -55,7 +55,6 @@ help:
 
 # キャッシュ有りでビルド
 build:
-	bash rescue2docker.sh
 	docker image build -t ${NAME} \
 	--build-arg CACHEBUST=${TS} .
 
@@ -63,7 +62,6 @@ build:
 run:
 	xhost local:
 	touch ${SCORE_FILE}
-	bash rescue2docker.sh
 	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
@@ -82,7 +80,6 @@ run:
 rioneLauncher:
 	xhost local:
 	touch ${SCORE_FILE}
-	bash rescue2docker.sh
 	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
@@ -109,7 +106,6 @@ rebuild:
 	if [ "$$ans" != y ]; then  \
       exit 1;\
     fi
-	bash rescue2docker.sh
 	docker image build -t ${NAME} \
 	--build-arg CACHEBUST=${TS} \
 	--pull \
@@ -119,13 +115,13 @@ rebuild:
 connect:
 	docker exec -u root -it ${NAME} /bin/bash
 
-sync:
-	bash rescue2docker.sh
-ifeq ($(shell docker container ls | grep "rescue_d:latest"),)
-	@echo "コンテナが起動していません"
-	exit 1
-endif
-	docker cp ${RescueSRC}/ ${NAME}:/${DOCKER_USER_NAME}/
+# sync:
+# 	bash rescue2docker.sh
+# ifeq ($(shell docker container ls | grep "rescue_d:latest"),)
+# 	@echo "コンテナが起動していません"
+# 	exit 1
+# endif
+# 	docker cp ${RescueSRC}/ ${NAME}:/${DOCKER_USER_NAME}/
 
 update:
 	git pull
@@ -153,6 +149,8 @@ endif
 
 # デバッグ用
 test:
+	touch ${SCORE_FILE}
+	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
 	--rm \
@@ -162,3 +160,32 @@ test:
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
+	docker container ls
+	# bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
+	docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
+	docker container exec -d ${NAME} make testInContainer
+	bash execRioneLauncherInDocker.sh ${NAME} debug
+
+# テストマップの時間を10サイクルに変更
+# テストする際に300サイクル待っていられないので作成
+testInContainer:
+	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
+
+# github actions用
+# github actionsにはTTYがないので-itが使えない
+# -itを使えないとrun状態でコンテナを待機させられないので疑似TTYを使うためのfakettyをTTYの使用するコマンドの先頭につける
+github-actions-test:
+	touch ${SCORE_FILE}
+	bash dockerContainerStop.sh ${NAME}
+	faketty docker container run \ 
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
+	-e DISPLAY=unix${DISPLAY} \
+	-v /tmp/.X11-unix/:/tmp/.X11-unix \
+	${NAME}:latest
+	docker container ls
+	docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
+	docker container stop ${NAME}

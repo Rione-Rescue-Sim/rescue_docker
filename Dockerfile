@@ -49,15 +49,22 @@ RUN echo "source /usr/share/bash-completion/completions/git" >> ~/.bashrc
 
 USER ${DOCKER_USER_}
 
+# レスキューサーバの取得をタグから行うため、バージョンによってディレクトリ名が変わる。
+# 以降のコード内でサーバのディレクトリ名を一致させるために作成
+ENV RCRS_SREVER_NAME rcrs-server-1.5
 # レスキューサーバをインストール
-RUN git clone https://github.com/roborescue/rcrs-server.git
-RUN cd /${DIRPATH}/rcrs-server && \
-	./gradlew clean && \
+RUN wget -q https://github.com/roborescue/rcrs-server/archive/refs/tags/v1.5.tar.gz &&\
+	tar xzf v1.5.tar.gz &&\
+	rm v1.5.tar.gz &&\
+	cd ${RCRS_SREVER_NAME} &&\
+	./gradlew clean &&\
 	./gradlew completeBuild
 
 # サンプルコードをインストール
-RUN git clone https://github.com/roborescue/rcrs-adf-sample.git
-RUN cd /${DIRPATH}/rcrs-adf-sample && \
+RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v1.1.tar.gz &&\
+	tar xzf v1.1.tar.gz &&\
+	rm v1.1.tar.gz &&\
+	cd /${DIRPATH}/adf-sample-agent-java-1.1 && \
 	./gradlew clean && \
 	./gradlew build
 
@@ -86,12 +93,9 @@ RUN cd /${DIRPATH}/RioneLauncher/ && \
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
 
-RUN cd /${DIRPATH}/rcrs-server/ && \
-	git pull && \
-	cd /${DIRPATH}/rcrs-adf-sample/ && \
+RUN cd /${DIRPATH}/RioneLauncher/ && \
 	git pull &&\
-	cd /${DIRPATH}/RioneLauncher/ && \
-	git pull
+	git checkout develop
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR /${DIRPATH}/RioneLauncher

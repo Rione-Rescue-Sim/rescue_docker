@@ -1,6 +1,6 @@
 version: '3'
 services:
-  master:
+  RioneLauncher:
     image: rescue_d:latest
     build: Dockerfile
     tty: true
