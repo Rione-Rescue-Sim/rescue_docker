@@ -50,7 +50,7 @@ help:
 	@echo "\t\tgit pull & make build"
 	@echo ""
 	@echo "make install\tDockerの環境構築"
-	@echo "\t\t主にDocker環境の構築＆sudo無しでのDockerコマンド実行の設定"
+	@echo "\t\t主にDocker環境の構築&sudo無しでのDockerコマンド実行の設定"
 	@echo "----------------------------------"
 
 # キャッシュ有りでビルド
@@ -92,6 +92,26 @@ rioneLauncher:
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	bash execRioneLauncherInDocker.sh ${NAME}
+
+rioneLauncher-score-upload:
+	xhost local:
+	touch ${SCORE_FILE}
+	bash dockerContainerStop.sh ${NAME}
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
+	-e DISPLAY=unix${DISPLAY} \
+	-v /tmp/.X11-unix/:/tmp/.X11-unix \
+	${NAME}:latest
+	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
+	bash execRioneLauncherInDocker.sh ${NAME}
+	make score-upload
+
+score-upload:
+	bash scoreUpload.sh ${SCORE_FILE}
 
 
 # dockerのリソースを開放
