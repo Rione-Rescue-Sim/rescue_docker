@@ -2,6 +2,7 @@ name: TEST
 
 on:
   push:
+  workflow_dispatch:
   schedule:
     - cron: "* 0 * * 1"
 
@@ -37,32 +38,12 @@ jobs:
       - name: run
         run: |
           make github-actions-test
-      - name: Send GitHub Action trigger data to Slack workflow
-        id: slack
-        uses: slackapi/slack-github-action@v1.16.0
+      - name: Slack Incoming Webhooks
+        uses: 8398a7/action-slack@v3.8.0
         with:
-          payload: |
-            {
-              "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
-                  }
-                },
-                {
-                  "type": "context",
-                  "elements": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "Author: <https://github.com/${{ github.event.sender.login }}|@${{ github.event.sender.login }}>"
-                    }
-                  ]
-                }
-              ]
-            }
+          status: ${{ job.status }}
+          fields: rep,took,eventName
         env:
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+        if: always()
