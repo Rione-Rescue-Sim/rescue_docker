@@ -31,7 +31,7 @@ RUN apt-get install -y xterm && apt-get install -y x11-xserver-utils\
 RUN apt-get update
 RUN apt-get install -y curl && apt-get install -y wget\
 	git\
-	openjdk-11-jdk\
+	openjdk-17-jdk\
 	gnome-terminal\
 	cron\
 	gradle\
@@ -51,19 +51,19 @@ USER ${DOCKER_USER_}
 
 # レスキューサーバの取得をタグから行うため、バージョンによってディレクトリ名が変わる。
 # 以降のコード内でサーバのディレクトリ名を一致させるために作成
-ENV RCRS_SREVER_NAME rcrs-server-1.5
+ENV RCRS_SREVER_NAME rcrs-server-2.0
 # レスキューサーバをインストール
-RUN wget https://github.com/roborescue/rcrs-server/archive/refs/tags/v1.5.tar.gz &&\
-	tar xzf v1.5.tar.gz &&\
-	rm v1.5.tar.gz &&\
+RUN wget https://github.com/roborescue/rcrs-server/archive/refs/tags/v2.0.tar.gz &&\
+	tar xzf v2.0.tar.gz &&\
+	rm v2.0.tar.gz &&\
 	cd ${RCRS_SREVER_NAME} &&\
 	./gradlew clean &&\
 	./gradlew completeBuild
 
 # サンプルコードをインストール
-RUN wget https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v1.1.tar.gz &&\
-	tar xzf v1.1.tar.gz &&\
-	rm v1.1.tar.gz &&\
+RUN wget https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v4.0.tar.gz &&\
+	tar xzf v4.0.tar.gz &&\
+	rm v4.0.tar.gz &&\
 	cd /${DIRPATH}/adf-sample-agent-java-1.1 && \
 	./gradlew clean && \
 	./gradlew build
@@ -94,8 +94,7 @@ RUN cd /${DIRPATH}/RioneLauncher/ && \
 ENV NO_AT_BRIDGE 1
 
 RUN cd /${DIRPATH}/RioneLauncher/ && \
-	git pull &&\
-	git checkout develop
+	git pull
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR /${DIRPATH}/RioneLauncher
