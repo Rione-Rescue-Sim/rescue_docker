@@ -16,6 +16,6 @@ function last(){
 docker container exec \
 	-it \
 	${CONTAINER_NAME} \
-	bash rioneLauncher_2.2.2.sh ${ARG}
+	bash rioneLauncher.sh ${ARG}
 
 docker container stop ${CONTAINER_NAME}

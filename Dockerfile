@@ -90,7 +90,8 @@ RUN cd /${DIRPATH}/RioneLauncher/ && \
 ENV NO_AT_BRIDGE 1
 
 RUN cd /${DIRPATH}/RioneLauncher/ && \
-	git pull
+	git pull && \
+	git checkout launcher_division
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR /${DIRPATH}/RioneLauncher
