@@ -91,7 +91,7 @@ rioneLauncher:
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	bash execRioneLauncherInDocker.sh ${NAME}
+	bash execRioneLauncherInDocker.sh ${NAME} 1
 
 rioneLauncher-score-upload:
 	xhost local:
@@ -107,7 +107,7 @@ rioneLauncher-score-upload:
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	bash execRioneLauncherInDocker.sh ${NAME}
+	bash execRioneLauncherInDocker.sh ${NAME} 1
 	make score-upload
 
 score-upload:

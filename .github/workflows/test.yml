@@ -2,8 +2,9 @@ name: TEST
 
 on:
   push:
+  workflow_dispatch:
   schedule:
-    - cron: '* 0 * * 1'
+    - cron: "* 0 * * 1"
 
 jobs:
   test:
@@ -37,3 +38,12 @@ jobs:
       - name: run
         run: |
           make github-actions-test
+      - name: Slack Incoming Webhooks
+        uses: 8398a7/action-slack@v3.8.0
+        with:
+          status: ${{ job.status }}
+          fields: ref,commit,rep,took,eventName
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+        if: always()
