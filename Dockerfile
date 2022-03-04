@@ -4,11 +4,10 @@ FROM ubuntu:18.04
 # ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内のDOCKER_USER_NAMEも書き換えること
 ARG DOCKER_USER_=RDocker
 
-RUN apt-get update
 
 # パッケージインストールで参照するサーバを日本サーバに変更
 # デフォルトのサーバは遠いので通信速度が遅い
-RUN apt-get install -y apt-utils && apt-get install -y perl\
+RUN apt-get update && apt-get install -y apt-utils && apt-get install -y perl\
 	&& perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://jp.archive.ubuntu.com/ubuntu/%' /etc/apt/sources.list \
 	&& apt-get update
 
@@ -22,14 +21,12 @@ ENV LC_ALL ja_JP.UTF-8
 RUN update-locale LANG=ja_JP.UTF-8
 
 # GUI出力のためのパッケージ
-RUN apt-get update
-RUN apt-get install -y xterm && apt-get install -y x11-xserver-utils\
+RUN apt-get update && apt-get install -y xterm && apt-get install -y x11-xserver-utils\
 	dbus-x11\
 	libcanberra-gtk*
 
 # レスキュー実行のためのパッケージ
-RUN apt-get update
-RUN apt-get install -y curl && apt-get install -y wget\
+RUN apt-get update && apt-get install -y curl && apt-get install -y wget\
 	git\
 	openjdk-17-jdk\
 	gnome-terminal\
@@ -53,18 +50,17 @@ USER ${DOCKER_USER_}
 # 以降のコード内でサーバのディレクトリ名を一致させるために作成
 ENV RCRS_SREVER_NAME rcrs-server-2.0
 # レスキューサーバをインストール
-RUN wget https://github.com/roborescue/rcrs-server/archive/refs/tags/v2.0.tar.gz &&\
+RUN wget -q https://github.com/roborescue/rcrs-server/archive/refs/tags/v2.0.tar.gz &&\
 	tar xzf v2.0.tar.gz &&\
 	rm v2.0.tar.gz &&\
 	cd ${RCRS_SREVER_NAME} &&\
-	./gradlew clean &&\
 	./gradlew completeBuild
 
 # サンプルコードをインストール
-RUN wget https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v4.0.tar.gz &&\
+RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v4.0.tar.gz &&\
 	tar xzf v4.0.tar.gz &&\
 	rm v4.0.tar.gz &&\
-	cd /${DIRPATH}/adf-sample-agent-java-1.1 && \
+	cd /${DIRPATH}/adf-sample-agent-java-4.0 && \
 	./gradlew clean && \
 	./gradlew build
 
