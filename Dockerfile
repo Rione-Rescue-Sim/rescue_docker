@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y curl && apt-get install -y wget\
 ENV DIRPATH home/${DOCKER_USER_}
 WORKDIR $DIRPATH
 
-# RUN groupadd rescue
+RUN groupadd rescue
 RUN useradd ${DOCKER_USER_}
 RUN chown -R ${DOCKER_USER_} /${DIRPATH}
 
@@ -54,7 +54,9 @@ RUN wget -q https://github.com/roborescue/rcrs-server/archive/refs/tags/v2.0.tar
 	tar xzf v2.0.tar.gz &&\
 	rm v2.0.tar.gz &&\
 	cd ${RCRS_SREVER_NAME} &&\
-	./gradlew completeBuild
+	./gradlew completeBuild &&\
+	chmod -R 777 ../${RCRS_SREVER_NAME}
+
 
 # サンプルコードをインストール
 RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v4.0.tar.gz &&\
@@ -62,7 +64,8 @@ RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tag
 	rm v4.0.tar.gz &&\
 	cd /${DIRPATH}/adf-sample-agent-java-4.0 && \
 	./gradlew clean && \
-	./gradlew build
+	./gradlew build &&\
+	chmod -R 777 /${DIRPATH}/adf-sample-agent-java-4.0
 
 # ランチャーを取得
 RUN git clone https://github.com/Rione-Rescue-Sim/RioneLauncher.git
@@ -75,10 +78,6 @@ RUN echo CACHEBUST: $CACHEBUST
 # Docker内でupgradeは避けたほうがいいと言われているが、rescueはウェブサーバでは無いのでupgradeを使う
 USER root
 RUN apt-get update && apt-get -y upgrade
-
-# レスキューのソースコードをコンテナ内にコピー
-# RUN cd /${DIRPATH} && mkdir ${RescueSRC_}
-# COPY --chown=${DOCKER_USER_}:${DOCKER_USER_} ${RescueSRC_}/ /${DIRPATH}/${RescueSRC_}/
 
 USER ${DOCKER_USER_}
 

@@ -73,7 +73,7 @@ run:
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	docker container exec -it ${NAME} bash
+	- docker container exec -it ${NAME} bash
 	docker container stop ${NAME}
 
 
@@ -90,13 +90,13 @@ rioneLauncher:
 	-e DISPLAY=unix${DISPLAY} \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
-	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
+	- bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	bash execRioneLauncherInDocker.sh ${NAME} 1
 
 
 # dockerのリソースを開放
 clean:
-	docker system prune
+	docker system prune -y
 
 # キャッシュを使わずにビルド
 rebuild:
