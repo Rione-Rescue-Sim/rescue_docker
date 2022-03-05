@@ -96,7 +96,7 @@ rioneLauncher:
 
 # dockerのリソースを開放
 clean:
-	docker system prune -y
+	docker system prune
 
 # キャッシュを使わずにビルド
 rebuild:

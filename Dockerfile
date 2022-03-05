@@ -92,5 +92,7 @@ RUN cd /${DIRPATH}/RioneLauncher/ && \
 	git pull && \
 	git checkout launcher_division
 
+USER root
+
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR /${DIRPATH}/RioneLauncher
