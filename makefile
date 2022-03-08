@@ -73,7 +73,7 @@ run:
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	docker container exec -it ${NAME} bash
+	- docker container exec -it ${NAME} bash
 	docker container stop ${NAME}
 
 
@@ -92,6 +92,24 @@ rioneLauncher:
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	bash execRioneLauncherInDocker.sh ${NAME}
+
+develop:
+	xhost local:
+	touch ${SCORE_FILE}
+	bash dockerContainerStop.sh ${NAME}
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
+	-e DISPLAY=unix${DISPLAY} \
+	-v /tmp/.X11-unix/:/tmp/.X11-unix \
+	${NAME}:latest
+	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
+	docker cp ../RioneLauncher/rioneLauncher_2.2.2.sh ${NAME}:${DOCKER_HOME_DIR}
+	- docker container exec -it ${NAME} bash
+	docker container stop ${NAME}
 
 
 # dockerのリソースを開放

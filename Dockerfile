@@ -45,31 +45,32 @@ WORKDIR $DIRPATH
 RUN useradd ${DOCKER_USER_}
 RUN chown -R ${DOCKER_USER_} /${DIRPATH}
 
-RUN echo "source /usr/share/bash-completion/completions/git" >> ~/.bashrc
-
 USER ${DOCKER_USER_}
+
+RUN echo "source /usr/share/bash-completion/completions/git" >> ~/.bashrc
 
 # レスキューサーバの取得をタグから行うため、バージョンによってディレクトリ名が変わる。
 # 以降のコード内でサーバのディレクトリ名を一致させるために作成
 ENV RCRS_SREVER_NAME rcrs-server-2.0
 # レスキューサーバをインストール
-RUN wget https://github.com/roborescue/rcrs-server/archive/refs/tags/v2.0.tar.gz &&\
+RUN wget -q https://github.com/roborescue/rcrs-server/archive/refs/tags/v2.0.tar.gz &&\
 	tar xzf v2.0.tar.gz &&\
 	rm v2.0.tar.gz &&\
 	cd ${RCRS_SREVER_NAME} &&\
-	./gradlew clean &&\
-	./gradlew completeBuild
+	./gradlew completeBuild &&\
+	mkdir logs && cd logs && mkdir log
 
 # サンプルコードをインストール
-RUN wget https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v4.0.tar.gz &&\
+RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tags/v4.0.tar.gz &&\
 	tar xzf v4.0.tar.gz &&\
 	rm v4.0.tar.gz &&\
-	cd /${DIRPATH}/adf-sample-agent-java-1.1 && \
+	cd /${DIRPATH}/adf-sample-agent-java-4.0 && \
 	./gradlew clean && \
 	./gradlew build
 
 # ランチャーを取得
-RUN git clone https://github.com/Rione-Rescue-Sim/RioneLauncher.git
+RUN git clone https://github.com/Rione-Rescue-Sim/RioneLauncher.git &&\
+	git checkout java-17
 
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
 # ビルド時に最低限必要な処理
@@ -79,10 +80,6 @@ RUN echo CACHEBUST: $CACHEBUST
 # Docker内でupgradeは避けたほうがいいと言われているが、rescueはウェブサーバでは無いのでupgradeを使う
 USER root
 RUN apt-get update && apt-get -y upgrade
-
-# レスキューのソースコードをコンテナ内にコピー
-# RUN cd /${DIRPATH} && mkdir ${RescueSRC_}
-# COPY --chown=${DOCKER_USER_}:${DOCKER_USER_} ${RescueSRC_}/ /${DIRPATH}/${RescueSRC_}/
 
 USER ${DOCKER_USER_}
 
