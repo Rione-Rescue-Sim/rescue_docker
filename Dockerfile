@@ -70,7 +70,9 @@ RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tag
 
 # ランチャーを取得
 RUN git clone https://github.com/Rione-Rescue-Sim/RioneLauncher.git &&\
-	git checkout java-17
+	cd RioneLauncher &&\
+	git pull &&\
+	git checkout java17
 
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
 # ビルド時に最低限必要な処理
