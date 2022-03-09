@@ -9,7 +9,7 @@ RUN apt-get update
 # パッケージインストールで参照するサーバを日本サーバに変更
 # デフォルトのサーバは遠いので通信速度が遅い
 RUN apt-get install -y apt-utils && apt-get install -y perl\
-	&& perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://jp.archive.ubuntu.com/ubuntu/%' /etc/apt/sources.list \
+	&& perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://ftp.riken.jp/Linux/ubuntu/%' /etc/apt/sources.list \
 	&& apt-get update
 
 # ターミナルで日本語の出力を可能にするための設定
