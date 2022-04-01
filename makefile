@@ -60,7 +60,24 @@ build:
 
 # コンテナ実行
 run:
-	xhost local:
+	make pre-exec_ --no-print-directory
+	- docker container exec -it ${NAME} bash
+	make post-exec_ --no-print-directory
+
+
+# ランチャーの実行
+# make run → bash rioneLauncherと打つのが手間なので作成
+rioneLauncher:
+	make pre-exec_ --no-print-directory
+	- docker container exec -it ${NAME} bash
+	- docker container exec -it ${NAME} bash rioneLauncher_2.2.2.sh 1
+	make post-exec_ --no-print-directory
+	# bash execRioneLauncherInDocker.sh ${NAME} 1
+
+# 起動前処理
+# コンテナの起動とファイルのコピーを行う
+pre-exec_:
+	xhost +local:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
 	docker container run \
@@ -69,30 +86,21 @@ run:
 	-d \
 	--name ${NAME} \
 	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
-	-e DISPLAY=unix${DISPLAY} \
+	-e DISPLAY=:0.0 \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	- docker container exec -it ${NAME} bash
+	- docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
+
+# コンテナ終了時の処理
+# ログをローカルへコピーする
+post-exec_:
+	- docker container cp ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/agent.log ./agent.log
+	- docker container cp ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/server.log ./server.log
 	docker container stop ${NAME}
 
 
-rioneLauncher:
-	xhost local:
-	touch ${SCORE_FILE}
-	bash dockerContainerStop.sh ${NAME}
-	docker container run \
-	-it \
-	--rm \
-	-d \
-	--name ${NAME} \
-	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
-	-e DISPLAY=unix${DISPLAY} \
-	-v /tmp/.X11-unix/:/tmp/.X11-unix \
-	${NAME}:latest
-	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	bash execRioneLauncherInDocker.sh ${NAME} 1
-
+# デバッグ用
 develop:
 	xhost local:
 	touch ${SCORE_FILE}
