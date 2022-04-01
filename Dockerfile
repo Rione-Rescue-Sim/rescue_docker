@@ -8,12 +8,14 @@ RUN apt-get update
 
 # パッケージインストールで参照するサーバを日本サーバに変更
 # デフォルトのサーバは遠いので通信速度が遅い
-RUN apt-get install -y apt-utils && apt-get install -y perl\
+RUN apt-get install -y apt-utils\
+	&& apt-get install -y perl\
 	&& perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://ftp.riken.jp/Linux/ubuntu/%' /etc/apt/sources.list \
 	&& apt-get update
 
 # ターミナルで日本語の出力を可能にするための設定
-RUN apt-get install -y language-pack-ja && apt-get install -y bash-completion\
+RUN apt-get install -y language-pack-ja\
+	bash-completion\
 	gnome-terminal
 RUN locale-gen ja_JP.UTF-8
 ENV LANG ja_JP.UTF-8
@@ -28,8 +30,10 @@ RUN apt-get install -y xterm && apt-get install -y x11-xserver-utils\
 	libcanberra-gtk*
 
 # レスキュー実行のためのパッケージ
-RUN apt-get update
-RUN apt-get install -y curl && apt-get install -y wget\
+RUN apt-get update \
+	&& apt-get install -y \
+	curl \
+	wget\
 	git\
 	openjdk-17-jdk\
 	gnome-terminal\
@@ -81,7 +85,10 @@ RUN echo CACHEBUST: $CACHEBUST
 
 # Docker内でupgradeは避けたほうがいいと言われているが、rescueはウェブサーバでは無いのでupgradeを使う
 USER root
-RUN apt-get update && apt-get -y upgrade
+RUN apt-get update && \
+	apt-get -y upgrade && \
+	apt-get clean &&\
+	rm -rf /var/lib/apt/lists/*
 
 USER ${DOCKER_USER_}
 
