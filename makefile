@@ -69,7 +69,6 @@ run:
 # make run → bash rioneLauncherと打つのが手間なので作成
 rioneLauncher:
 	make pre-exec_ --no-print-directory
-	- docker container exec -it ${NAME} bash
 	- docker container exec -it ${NAME} bash rioneLauncher_2.2.2.sh 1
 	make post-exec_ --no-print-directory
 	# bash execRioneLauncherInDocker.sh ${NAME} 1
