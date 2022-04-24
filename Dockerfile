@@ -24,14 +24,12 @@ ENV LC_ALL ja_JP.UTF-8
 RUN update-locale LANG=ja_JP.UTF-8
 
 # GUI出力のためのパッケージ
-RUN apt-get update
 RUN apt-get install -y xterm && apt-get install -y x11-xserver-utils\
 	dbus-x11\
 	libcanberra-gtk*
 
 # レスキュー実行のためのパッケージ
-RUN apt-get update \
-	&& apt-get install -y \
+RUN apt-get install -y \
 	curl \
 	wget\
 	git\
@@ -51,7 +49,6 @@ RUN chown -R ${DOCKER_USER_} /${DIRPATH}
 
 USER ${DOCKER_USER_}
 
-RUN echo "source /usr/share/bash-completion/completions/git" >> ~/.bashrc
 
 # レスキューサーバの取得をタグから行うため、バージョンによってディレクトリ名が変わる。
 # 以降のコード内でサーバのディレクトリ名を一致させるために作成
@@ -78,29 +75,25 @@ RUN git clone https://github.com/Rione-Rescue-Sim/RioneLauncher.git &&\
 	git pull &&\
 	git checkout java17
 
+USER root
+RUN apt-get clean
+
 #  ------------これ以降はビルド時にキャッシュを使用しない------------
 # ビルド時に最低限必要な処理
 ARG CACHEBUST=1
 RUN echo CACHEBUST: $CACHEBUST
 
-# Docker内でupgradeは避けたほうがいいと言われているが、rescueはウェブサーバでは無いのでupgradeを使う
-USER root
-RUN apt-get update && \
-	apt-get -y upgrade && \
-	apt-get clean &&\
-	rm -rf /var/lib/apt/lists/*
-
 USER ${DOCKER_USER_}
 
 # ホストのscore.csvをマウントするためにファイル作成
-RUN cd /${DIRPATH}/RioneLauncher/ && \
-	touch score.csv
+RUN cd /${DIRPATH}/RioneLauncher/ \
+&&	touch score.csv
 
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
 
-RUN cd /${DIRPATH}/RioneLauncher/ && \
-	git pull
+RUN cd /${DIRPATH}/RioneLauncher/ \
+&&	git pull
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR /${DIRPATH}/RioneLauncher
