@@ -42,19 +42,18 @@ make rebuild
 ```
 make update
 ```
+## レスキューを実行
+* make run と bash rioneLauncher 1をひとつのコマンドで行う
+* 実行時には自動的にrescueのソースコードをコンテナ内にコピーするので同期は考えなくていい
+```
+make rioneLauncher
+```
 
 ## コンテナの実行
 * コンテナ内に入って何かするときに使用
-* コンテナ内のデータはscore.csvを除いですべて破棄される
+* コンテナ内のデータはscore.csvを除いてすべて破棄される
 ```
 make run
-```
-
-
-## ソースコードをコンテナ内に同期
-* make runによってコンテナが起動中に別の端末から実行
-```
-make sync
 ```
 
 ## root権限でコンテナに接続
