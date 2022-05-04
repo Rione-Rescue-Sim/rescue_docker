@@ -55,12 +55,33 @@ help:
 
 # キャッシュ有りでビルド
 build:
-	docker image build -t ${NAME} \
-	--build-arg CACHEBUST=${TS} .
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
+	--build-arg CACHEBUST=${TS} \
+	--force-rm=true .
+	- docker rmi $(shell docker images -f 'dangling=true' -q)
 
-# コンテナ実行
+# コンテナ内でbashを実行
+# 対話的な動作をする場合に使用
 run:
-	xhost local:
+	make pre-exec_ --no-print-directory
+	- docker container exec -it ${NAME} bash
+	make post-exec_ --no-print-directory
+
+
+# ランチャーの実行
+# make run → bash rioneLauncherと打つのが手間なので作成
+rioneLauncher:
+	make pre-exec_ --no-print-directory
+	- docker container exec -it ${NAME} bash rioneLauncher_2.2.2.sh 1
+	make post-exec_ --no-print-directory
+
+# 起動前処理
+# コンテナの起動とファイルのコピーを行う
+pre-exec_:
+ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
+	docker container stop ${NAME}
+endif
+	xhost +local:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
 	docker container run \
@@ -69,15 +90,22 @@ run:
 	-d \
 	--name ${NAME} \
 	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
-	-e DISPLAY=unix${DISPLAY} \
+	-e DISPLAY=:0.0 \
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	docker container exec -it ${NAME} bash
+	- docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
+
+# コンテナ終了時の処理
+# ログをローカルへコピーする
+post-exec_:
+	- docker container cp ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/agent.log ./agent.log
+	- docker container cp ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/server.log ./server.log
 	docker container stop ${NAME}
 
 
-rioneLauncher:
+# デバッグ用
+develop:
 	xhost local:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
@@ -126,22 +154,15 @@ rebuild:
 	if [ "$$ans" != y ]; then  \
       exit 1;\
     fi
-	docker image build -t ${NAME} \
+	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
 	--build-arg CACHEBUST=${TS} \
 	--pull \
+	--force-rm=true \
 	--no-cache=true .
 
 # root権限で起動中のコンテナに接続
 connect:
 	docker exec -u root -it ${NAME} /bin/bash
-
-# sync:
-# 	bash rescue2docker.sh
-# ifeq ($(shell docker container ls | grep "rescue_d:latest"),)
-# 	@echo "コンテナが起動していません"
-# 	exit 1
-# endif
-# 	docker cp ${RescueSRC}/ ${NAME}:/${DOCKER_USER_NAME}/
 
 update:
 	git pull
@@ -169,9 +190,20 @@ endif
 
 # デバッグ用
 test:
+ifneq ($(shell docker ps -a | grep ${NAME}),)
+	docker container stop ${NAME}
+endif
+
+testInContainer:
+	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
+
+# github actions用
+# github actionsにはTTYがないので-itが使えない
+# -itを使えないとrun状態でコンテナを待機させられないので疑似TTYを使うためのfakettyをTTYの使用するコマンドの先頭につける
+github-actions-test:
 	touch ${SCORE_FILE}
 	bash dockerContainerStop.sh ${NAME}
-	docker container run \
+	faketty docker container run \
 	-it \
 	--rm \
 	-d \
