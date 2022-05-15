@@ -58,7 +58,9 @@ build:
 	DOCKER_BUILDKIT=1 docker image build -t ${NAME} \
 	--build-arg CACHEBUST=${TS} \
 	--force-rm=true .
+ifneq ($(shell docker images -f 'dangling=true' -q),)
 	- docker rmi $(shell docker images -f 'dangling=true' -q)
+endif
 
 # コンテナ内でbashを実行
 # 対話的な動作をする場合に使用
@@ -95,6 +97,7 @@ endif
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	- docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
+	@echo "\nコンテナから抜ける場合は\e[31m exit \e[mと入力\n"
 
 # コンテナ終了時の処理
 # ログをローカルへコピーする
@@ -104,38 +107,11 @@ post-exec_:
 	docker container stop ${NAME}
 
 
-# デバッグ用
-develop:
-	xhost local:
-	touch ${SCORE_FILE}
-	bash dockerContainerStop.sh ${NAME}
-	docker container run \
-	-it \
-	--rm \
-	-d \
-	--name ${NAME} \
-	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
-	-e DISPLAY=unix${DISPLAY} \
-	-v /tmp/.X11-unix/:/tmp/.X11-unix \
-	${NAME}:latest
-	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	bash execRioneLauncherInDocker.sh ${NAME} 1
-
+# 終了時にgithubへスコアをアップロード
 rioneLauncher-score-upload:
-	xhost local:
-	touch ${SCORE_FILE}
-	bash dockerContainerStop.sh ${NAME}
-	docker container run \
-	-it \
-	--rm \
-	-d \
-	--name ${NAME} \
-	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
-	-e DISPLAY=unix${DISPLAY} \
-	-v /tmp/.X11-unix/:/tmp/.X11-unix \
-	${NAME}:latest
-	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	bash execRioneLauncherInDocker.sh ${NAME} 1
+	make pre-exec_ --no-print-directory
+	- docker container exec -it ${NAME} bash rioneLauncher_2.2.2.sh 1
+	make post-exec_ --no-print-directory
 	make score-upload
 
 score-upload:
@@ -197,31 +173,6 @@ endif
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
 
-# github actions用
-# github actionsにはTTYがないので-itが使えない
-# -itを使えないとrun状態でコンテナを待機させられないので疑似TTYを使うためのfakettyをTTYの使用するコマンドの先頭につける
-github-actions-test:
-	touch ${SCORE_FILE}
-	bash dockerContainerStop.sh ${NAME}
-	faketty docker container run \
-	-it \
-	--rm \
-	-d \
-	--name ${NAME} \
-	--mount type=bind,src=$(PWD)/${SCORE_FILE},dst=${DOCKER_HOME_DIR}/RioneLauncher/${SCORE_FILE} \
-	-e DISPLAY=unix${DISPLAY} \
-	-v /tmp/.X11-unix/:/tmp/.X11-unix \
-	${NAME}:latest
-	docker container ls
-	# bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	docker cp makefile ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/makefile
-	docker container exec -d ${NAME} make testInContainer
-	bash execRioneLauncherInDocker.sh ${NAME} debug
-
-# テストマップの時間を10サイクルに変更
-# テストする際に300サイクル待っていられないので作成
-testInContainer:
-	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
 
 # github actions用
 # github actionsにはTTYがないので-itが使えない
