@@ -97,6 +97,7 @@ endif
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
 	- docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
+	docker exec -it --user root ${NAME} bash -c "cd ../${RescueSRC} && chmod a+x gradlew launch.sh"
 	@echo "\nコンテナから抜ける場合は\e[31m exit \e[mと入力\n"
 
 # コンテナ終了時の処理
