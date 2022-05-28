@@ -77,6 +77,11 @@ rioneLauncher:
 	- docker container exec -it ${NAME} bash rioneLauncher_2.2.2.sh 1
 	make post-exec_ --no-print-directory
 
+compile:
+	make pre-exec_ --no-print-directory
+	- docker container exec -it ${NAME} bash -c "cd ../${RescueSRC} && ./gradlew build 2>&1 | tee agent.log"
+	make post-exec_ --no-print-directory
+
 # 起動前処理
 # コンテナの起動とファイルのコピーを行う
 pre-exec_:
@@ -173,6 +178,30 @@ endif
 
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
+
+testLauncher:
+ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停止
+	docker container stop ${NAME}
+endif
+	xhost +local:
+	touch ${SCORE_FILE}
+	bash dockerContainerStop.sh ${NAME}
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	-e DISPLAY=:0.0 \
+	-v /tmp/.X11-unix/:/tmp/.X11-unix \
+	${NAME}:latest
+	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
+	- docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
+	docker exec -it --user root ${NAME} bash -c "cd ../${RescueSRC} && chmod a+x gradlew launch.sh"
+	docker exec -it --user root ${NAME} bash -c "cd .. && rm -rf RioneLauncher"
+	- docker cp $(shell find ~/ -name RioneLauncher -type d) ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher
+	- docker container exec -it ${NAME} bash
+	make post-exec_ --no-print-directory
+
 
 
 # github actions用

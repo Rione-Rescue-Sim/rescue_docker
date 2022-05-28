@@ -87,13 +87,13 @@ USER ${DOCKER_USER_}
 
 # ホストのscore.csvをマウントするためにファイル作成
 RUN cd /${DIRPATH}/RioneLauncher/ \
-&&	touch score.csv
+	&&	touch score.csv
 
 # コンテナ内でgnome-terminalを開くと出てくるdbusのエラーを解消
 ENV NO_AT_BRIDGE 1
 
 RUN cd /${DIRPATH}/RioneLauncher/ \
-&&	git pull
+	&&	git pull
 
 # 起動時にはランチャーの実行が楽になるようにランチャーのあるディレクトリから始める
 WORKDIR /${DIRPATH}/RioneLauncher
