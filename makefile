@@ -78,9 +78,10 @@ rioneLauncher:
 	make post-exec_ --no-print-directory
 
 compile:
-	make pre-exec_ --no-print-directory
-	- docker container exec -it ${NAME} bash -c "cd ../${RescueSRC} && ./gradlew build 2>&1 | tee agent.log"
-	make post-exec_ --no-print-directory
+	@make pre-exec_ --no-print-directory
+	- docker container exec ${NAME} bash -c "cd ../${RescueSRC} && ./gradlew build 2>&1 | tee ../RioneLauncher/agent.log"
+	- docker container cp ${NAME}:${DOCKER_HOME_DIR}/RioneLauncher/agent.log ./agent.log
+	docker container stop ${NAME}
 
 # 起動前処理
 # コンテナの起動とファイルのコピーを行う
@@ -116,7 +117,7 @@ post-exec_:
 # 終了時にgithubへスコアをアップロード
 rioneLauncher-score-upload:
 	make pre-exec_ --no-print-directory
-	- docker container exec -it ${NAME} bash rioneLauncher_2.2.2.sh 1
+	- docker container exec ${NAME} bash rioneLauncher_2.2.2.sh 1
 	make post-exec_ --no-print-directory
 	make score-upload
 
@@ -143,7 +144,7 @@ rebuild:
 	--no-cache=true .
 
 # root権限で起動中のコンテナに接続
-connect:
+root:
 	docker exec -u root -it ${NAME} /bin/bash
 
 update:
@@ -153,16 +154,7 @@ update:
 # 環境構築
 install:
 	sudo apt update
-	sudo apt install -y apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-	sudo apt update
-	apt-cache policy docker-ce
-	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+	sudo apt install -y docker.io
 ifneq ($(shell getent group docker| cut -f 4 --delim=":"),$(shell whoami))
 	sudo gpasswd -a $(shell whoami) docker
 endif
