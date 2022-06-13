@@ -21,12 +21,9 @@ RUN apt-get install -y \
 	fcitx-mozc \
 	bash-completion\
 	gnome-terminal
+
 RUN locale-gen ja_JP.UTF-8
 ENV LANG ja_JP.UTF-8
-ENV GTK_IM_MODULE=xim \
-	QT_IM_MODULE=fcitx \
-	XMODIFIERS=@im=fcitx \
-	DefalutIMModule=fcitx
 RUN update-locale LANG=ja_JP.UTF-8
 
 # GUI出力のためのパッケージ
