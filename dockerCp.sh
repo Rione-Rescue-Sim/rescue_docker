@@ -3,8 +3,10 @@
 # レスキューのソースコードを探索し、コンテナ内にコピーする
 # makefileで配列やifを書くのは面倒なのでシェルスクリプトに記述
 
-CONTAINER_NAME=$1
-DOCKER_HOME_DIR=$2
+set -eu
+
+readonly CONTAINER_NAME=$1
+readonly DOCKER_HOME_DIR=$2
 
 if [[ -z ${CONTAINER_NAME} || -z ${DOCKER_HOME_DIR} ]]; then
 
