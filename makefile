@@ -91,7 +91,6 @@ ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停
 endif
 	xhost +local:
 	touch ${SCORE_FILE}
-	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
 	--rm \
@@ -102,8 +101,8 @@ endif
 	-v /tmp/.X11-unix/:/tmp/.X11-unix \
 	${NAME}:latest
 	bash dockerCp.sh ${NAME} ${DOCKER_HOME_DIR}
-	- docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc
-	docker exec -it --user root ${NAME} bash -c "cd ../${RescueSRC} && chmod a+x gradlew launch.sh"
+	- docker cp ~/.bashrc ${NAME}:${DOCKER_HOME_DIR}/.bashrc #コンテナにはコマンドのエイリアスや色の設定がないのでホストの設定ファイルをコピー
+	docker exec -it --user root ${NAME} bash -c "cd ../${RescueSRC} && chmod a+x gradlew launch.sh" #公式サーバのスクリプトに実行権限が無いので付与
 	@echo "\nコンテナから抜ける場合は\e[31m exit \e[mと入力\n"
 
 # コンテナ終了時の処理
@@ -177,7 +176,6 @@ ifneq ($(shell docker ps -a | grep ${NAME}),) #起動済みのコンテナを停
 endif
 	xhost +local:
 	touch ${SCORE_FILE}
-	bash dockerContainerStop.sh ${NAME}
 	docker container run \
 	-it \
 	--rm \
@@ -201,7 +199,6 @@ endif
 # -itを使えないとrun状態でコンテナを待機させられないので疑似TTYを使うためのfakettyをTTYの使用するコマンドの先頭につける
 github-actions-test:
 	touch ${SCORE_FILE}
-	bash dockerContainerStop.sh ${NAME}
 	faketty docker container run \
 	-it \
 	--rm \
