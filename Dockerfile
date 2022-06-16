@@ -75,8 +75,7 @@ RUN wget -q https://github.com/roborescue/adf-sample-agent-java/archive/refs/tag
 # ランチャーを取得
 RUN git clone https://github.com/Rione-Rescue-Sim/RioneLauncher.git &&\
 	cd RioneLauncher &&\
-	git pull &&\
-	git checkout java17
+	git pull
 
 USER root
 RUN apt-get clean
