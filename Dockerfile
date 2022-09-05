@@ -4,8 +4,9 @@ FROM ubuntu:18.04
 # ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内のDOCKER_USER_NAMEも書き換えること
 ARG DOCKER_USER_=RDocker
 
-COPY --chown=root:root sources.list /etc/apt/sources.list
+COPY net.sh /net.sh
 
+RUN sh net.sh
 
 RUN apt-get update
 

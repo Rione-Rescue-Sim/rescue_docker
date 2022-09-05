@@ -163,9 +163,14 @@ endif
 
 # デバッグ用
 test:
-ifneq ($(shell docker ps -a | grep ${NAME}),)
-	docker container stop ${NAME}
-endif
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	${NAME}:latest
+	-docker container exec -it ${NAME} bash
+	make -s post-exec_
 
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
