@@ -195,11 +195,9 @@ endif
 
 
 # github actions用
-# github actionsにはTTYがないので-itが使えない
-# -itを使えないとrun状態でコンテナを待機させられないので疑似TTYを使うためのfakettyをTTYの使用するコマンドの先頭につける
 github-actions-test:
 	touch ${SCORE_FILE}
-	faketty docker container run \
+	docker container run \
 	-it \
 	--rm \
 	-d \

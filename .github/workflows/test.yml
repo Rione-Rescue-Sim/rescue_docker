@@ -12,47 +12,11 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-      - name: Setup faketty
-        uses: Yuri6037/Action-FakeTTY@v1.1
-      - name: install
-        run: |
-          sudo apt update
-          sudo apt install -y apt-transport-https \
-            ca-certificates \
-            curl \
-            gnupg-agent \
-            software-properties-common
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-          sudo apt update
-          apt-cache policy docker-ce
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-          sudo systemctl restart docker
+      - name: install docker
+        uses: docker/setup-buildx-action@v2
       - name: build
         run: |
           make build
       - name: run
         run: |
           make github-actions-test
-      - name: Slack Incoming Webhooks
-        if: success()
-        uses: 8398a7/action-slack@v3.8.0
-        with:
-          status: ${{ job.status }}
-          fields: ref,commit,rep,took,eventName
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
-      - name: Slack Incoming Webhooks
-        if: failure()
-        uses: 8398a7/action-slack@v3.8.0
-        with:
-          status: ${{ job.status }}
-          fields: ref,commit,took,eventName,message,repo
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
