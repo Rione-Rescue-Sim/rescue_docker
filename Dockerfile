@@ -4,17 +4,14 @@ FROM ubuntu:18.04
 # ユーザ名はランチャーと依存関係にあるので変更する際はランチャー内のDOCKER_USER_NAMEも書き換えること
 ARG DOCKER_USER_=RDocker
 
+COPY --chown=root:root sources.list /etc/apt/sources.list
+
+
 RUN apt-get update
 
-# パッケージインストールで参照するサーバを日本サーバに変更
-# デフォルトのサーバは遠いので通信速度が遅い
-RUN apt-get install -y apt-utils\
-	&& apt-get install -y perl\
-	&& perl -p -i.bak -e 's%(deb(?:-src|)\s+)https?://(?!archive\.canonical\.com|security\.ubuntu\.com)[^\s]+%$1http://ftp.riken.jp/Linux/ubuntu/%' /etc/apt/sources.list \
-	&& apt-get update
-
 # ターミナルで日本語の出力を可能にするための設定
-RUN apt-get install -y \
+RUN apt-get update \
+	&& apt-get install -y \
 	language-pack-ja-base \
 	language-pack-ja \
 	fonts-noto-cjk \
