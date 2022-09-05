@@ -163,9 +163,14 @@ endif
 
 # デバッグ用
 test:
-ifneq ($(shell docker ps -a | grep ${NAME}),)
-	docker container stop ${NAME}
-endif
+	docker container run \
+	-it \
+	--rm \
+	-d \
+	--name ${NAME} \
+	${NAME}:latest
+	-docker container exec -it ${NAME} bash
+	make -s post-exec_
 
 testInContainer:
 	sed -i -e 's/kernel.timesteps: 300/kernel.timesteps: 10/' ~/rcrs-server-1.5/maps/gml/test/config/kernel.cfg
@@ -195,11 +200,9 @@ endif
 
 
 # github actions用
-# github actionsにはTTYがないので-itが使えない
-# -itを使えないとrun状態でコンテナを待機させられないので疑似TTYを使うためのfakettyをTTYの使用するコマンドの先頭につける
 github-actions-test:
 	touch ${SCORE_FILE}
-	faketty docker container run \
+	docker container run \
 	-it \
 	--rm \
 	-d \
